@@ -1,0 +1,243 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:SelfBooru"
+             x:Class="SelfBooru.MainPage"
+             x:Name="ThisPage"
+             Title="Gallery">
+    <ContentPage.BindingContext>
+        <local:MainPageViewModel />
+    </ContentPage.BindingContext>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="⚙"
+             Clicked="OnOpenSettings" />
+    </ContentPage.ToolbarItems>
+    <AbsoluteLayout>
+        
+        <!-- DataContext set in code-behind -->
+        <Grid Padding="20" RowSpacing="10" ColumnSpacing="10" AbsoluteLayout.LayoutBounds="0,0,1,1"
+          AbsoluteLayout.LayoutFlags="All">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Search pane -->
+            <VerticalStackLayout Grid.Row="0" Grid.Column="0" Spacing="5">
+                <!--<Button Text="⚙" 
+        Clicked="OnOpenSettings" 
+        HeightRequest="40" 
+        WidthRequest="40" 
+        HorizontalOptions="Start" 
+        VerticalOptions="Start" />-->
+                <HorizontalStackLayout Spacing="5">
+                    
+                    <Entry x:Name="SearchEntry"
+                       Text="{Binding SearchText, Mode=TwoWay}"
+                       Placeholder="Enter tags..."
+                       Completed="OnSearchCompleted"
+                       TextChanged="OnSearchTextChanged"
+                       Focused="OnSearchEntryFocused"
+                       Unfocused="OnSearchEntryUnfocused" WidthRequest="200"/>
+                    <Button x:Name="SearchConfirm" Text=">"
+                            Clicked="OnSearchCompleted"/>
+                </HorizontalStackLayout>
+
+
+
+
+                <Border x:Name="RelatedTagView"  IsVisible="{Binding RelatedTagsAvailable}"
+                    Background="White"
+                    Stroke="Gray"
+                    StrokeThickness="0"
+                    Padding="0">
+
+                    <CollectionView ItemsSource="{Binding RelatedTags}"
+                SelectionMode="Single"
+                SelectionChanged="OnRelatedTagSelected"
+                HeightRequest="900"
+                WidthRequest="230">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Label Text="{Binding}" Padding="8" />
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Border>
+
+
+                <!-- Autocomplete suggestions -->
+                <Border IsVisible="{Binding ShowSuggestions}"
+    Background="White"
+    Stroke="Gray"
+    StrokeThickness="1"
+    Padding="0"
+    VerticalOptions="Start"
+    ZIndex="10">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="4" />
+                    </Border.StrokeShape>
+                    <CollectionView ItemsSource="{Binding Suggestions}"
+                SelectionMode="Single"
+                SelectionChanged="OnSuggestionSelected"
+                HeightRequest="200"
+                WidthRequest="230">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Label Text="{Binding}" Padding="8" />
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Border>
+            </VerticalStackLayout>
+
+            <!-- Gallery grid -->
+            <CollectionView Grid.Row="0" Grid.Column="1"
+                        ItemsSource="{Binding PagedImages}"
+                        ItemsLayout="VerticalGrid, 8"
+                        EmptyView="No images found."
+                        SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Stroke="LightGray"
+                            StrokeThickness="0"
+                            Padding="4"
+                            Margin="4">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="5" />
+                            </Border.StrokeShape>
+                            <Image Source="{Binding Thumbnail}"
+                                   BackgroundColor="White"
+                               Aspect="AspectFill"
+                               HeightRequest="100"
+                               WidthRequest="100">
+                                <Image.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnThumbnailTapped"/>
+                                </Image.GestureRecognizers>
+                            </Image>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+                <CollectionView.Footer>
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="20" Padding="10">
+                        <Button Text="⏮" 
+                        IsVisible="{Binding HasMultiplePages}" 
+                        Command="{Binding GoToFirstPageCommand}" />
+
+                        <Button Text="Previous" 
+                        IsEnabled="{Binding CanPrevPage}" 
+                        Command="{Binding PrevPageCommand}" />
+
+                        <Label Text="{Binding PageDisplayText}" VerticalOptions="Center" />
+
+                        <Button Text="Next" 
+                        IsEnabled="{Binding CanNextPage}" 
+                        Command="{Binding NextPageCommand}" />
+
+                        <Button Text="⏭" 
+                        IsVisible="{Binding HasMultiplePages}" 
+                        Command="{Binding GoToLastPageCommand}" />
+                    </HorizontalStackLayout>
+                </CollectionView.Footer>
+            </CollectionView>
+
+            <!-- Preview Overlay -->
+            
+        </Grid>
+        <Grid x:Name="PreviewOverlay"
+  IsVisible="{Binding IsPreviewVisible}"
+ AbsoluteLayout.LayoutBounds="0,0,1,1"
+              
+          AbsoluteLayout.LayoutFlags="All">
+            <BoxView Color="#80000000"
+             AbsoluteLayout.LayoutBounds="0,0,1,1"
+             AbsoluteLayout.LayoutFlags="All">
+                <BoxView.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ClosePreviewCommand}" />
+                </BoxView.GestureRecognizers>
+            </BoxView>
+            <Image Source="{Binding SelectedImage.FullImage}"
+       Aspect="AspectFit"
+       VerticalOptions="Center"
+       HorizontalOptions="Center" />
+            <HorizontalStackLayout
+                      Spacing="20"
+                      Padding="20"
+                      HorizontalOptions="End"
+                      VerticalOptions="Start">
+                <Button Text="📂"
+            Command="{Binding RevealFileInExplorerCommand}"
+            BackgroundColor="White"
+            WidthRequest="40"
+            HeightRequest="40" />
+                <Button Text="📋"
+            Command="{Binding ShowMetadataCommand}"
+            BackgroundColor="White"
+            WidthRequest="40"
+            HeightRequest="40" />
+                <Button Text="✖"
+            Command="{Binding ClosePreviewCommand}"
+            BackgroundColor="White"
+            WidthRequest="40"
+            HeightRequest="40" />
+            </HorizontalStackLayout>
+            <Button Text="⏪"
+                Command="{Binding TryPreviousImageCommand}"
+                IsVisible="{Binding SelectedImage.CanGoPrevious}"
+                BackgroundColor="White"
+                    FontSize="Large"
+                WidthRequest="120"
+                HeightRequest="120"
+                HorizontalOptions="Start"
+                VerticalOptions="Center"
+            />
+            <Button Text="⏩" 
+                IsVisible="{Binding SelectedImage.CanGoNext}"
+                Command="{Binding TryNextImageCommand}"
+                BackgroundColor="White"
+                    FontSize="Large"
+                WidthRequest="120"
+                HeightRequest="120"
+                HorizontalOptions="End"
+                VerticalOptions="Center"
+            />
+        </Grid>
+        <Grid x:Name="MetadataOverlay"
+IsVisible="{Binding IsMetadataVisible}"
+AbsoluteLayout.LayoutBounds="0,0,1,1"
+        AbsoluteLayout.LayoutFlags="All">
+            <BoxView Color="#80000000"
+ AbsoluteLayout.LayoutBounds="0,0,1,1"
+ AbsoluteLayout.LayoutFlags="All">
+                <BoxView.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding HideMetadataCommand}" />
+                </BoxView.GestureRecognizers>
+            </BoxView>
+            <!--<Image Source="{Binding SelectedImagePath}"
+     Aspect="AspectFit"
+     VerticalOptions="Center"
+     HorizontalOptions="Center" />-->
+            <Editor  
+                BackgroundColor="White"
+                IsReadOnly="True"
+                   HeightRequest="500"
+                   WidthRequest="900"
+                
+                   Text="{Binding SelectedImage.Metadata}"/>
+            <HorizontalStackLayout
+                    Spacing="20"
+                    Padding="20"
+                    HorizontalOptions="End"
+                    VerticalOptions="Start">
+                <Button Text="✖"
+          Command="{Binding HideMetadataCommand}"
+          BackgroundColor="White"
+          WidthRequest="40"
+          HeightRequest="40" />
+            </HorizontalStackLayout>
+        </Grid>
+    </AbsoluteLayout>
+</ContentPage>

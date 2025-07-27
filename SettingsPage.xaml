@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SelfBooru.SettingsPage"
+             xmlns:local="clr-namespace:SelfBooru"
+             Title="Settings">
+    <ContentPage.BindingContext>
+        <local:SettingsViewModel />
+    </ContentPage.BindingContext>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="✖"
+             Clicked="OnCloseClicked" />
+    </ContentPage.ToolbarItems>
+    <VerticalStackLayout Padding="20" Spacing="10">
+        <!--<Button Text="✖" 
+        Clicked="OnCloseClicked" 
+        HeightRequest="40" 
+        WidthRequest="40" 
+        HorizontalOptions="Start" 
+        VerticalOptions="Start" />-->
+        <Label Text="Output Directory" FontSize="18" />
+        <Entry x:Name="outputdirentry" Text="{Binding OutputDir, Mode=TwoWay}" Placeholder="Path to your output folder"/>
+        
+        <Label Text="{Binding Status}" IsEnabled="{Binding ButtonScanEnabled}" FontSize="14" TextColor="OrangeRed" Margin="0,10,0,20"/>
+
+        <Button Text="Start Scan"
+                Command="{Binding StartScanCommand}"
+                IsEnabled="{Binding ButtonScanEnabled}" />
+        <Button Text="Cancel Scan"
+                Command="{Binding CancelScanCommand}"
+                IsEnabled="{Binding ButtonCancelEnabled}" />
+        <Button Text="Check and delete broken entries"
+                Margin="20"
+                BackgroundColor="DarkRed"
+                TextColor="White"
+                Command="{Binding CheckAndDeleteBrokenEntriesCommand}"
+                IsEnabled="{Binding ButtonScanEnabled}" />
+    </VerticalStackLayout>
+</ContentPage>

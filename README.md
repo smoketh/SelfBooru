@@ -8,6 +8,14 @@ After 2 years of SD generations I needed a way to search through all the images.
 So here's a solution for that. At the moment it's mainly a windows app, 
 but with a bit of editing it can be compiled on mac. 
 
+## Support the project
+<p align="left">
+  <img style="background-color: rgb(255,255,255);" width="200" height="auto" as src="https://upload.wikimedia.org/wikipedia/commons/9/92/Boosty_logo.svg"/>
+</p>
+
+If you found this app useful - consider chucking me a few bucks here
+ https://boosty.to/smoke_th
+
 ## Usage
 > [!NOTE]  
 > Click gear icon to the top-right, input your sd output dir 

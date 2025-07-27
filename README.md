@@ -19,8 +19,12 @@ but with a bit of editing it can be compiled on mac.
 > and click start scan. It will report when scan is complete.
 
 As of right now A1111/SD-Forge metadata format is supported, 
-stealth metadata is also supported. It uses comma separated tags for tags, 
+stealth metadata is also supported. Comfy metadata not supported as of yet.
+
+It uses comma separated tags for tags, 
 strips weights, also adds loras/lycos and models with `lora:` `lyco:` `model:` prefix into the tags as well.
+It replaces spaces with underscores, and tag search uses space separation, to match it
+with a standard image board format. 
 
 Can rescan detecting md5 hash changes, and will regenerate thumbnails when needed.
 
